@@ -1,11 +1,15 @@
 <!--
-Extends core-selector to support reprojected content.
+Extends core-selector to support easier composition:
 
-This lets you include a content element within the selector and select the
-distributed nodes rather than the content element itself.
+* The component can handle reprojected content. This lets you include a content
+  element within the selector and select the distributed nodes rather than the
+  content element itself.
 
-By default, this component also ignores any template elements in the content,
-making it easy to use templates to expand out a list of choices.
+* By default, this component also ignores any template elements in the content,
+  making it easy to use templates to expand out a list of choices.
+
+* This component generates property change notifications on the "items" property
+  if content is added or removed at runtime, so you can bind to "items".
 
 @element basic-selector
 -->
@@ -16,6 +20,19 @@ making it easy to use templates to expand out a list of choices.
 <polymer-element name="basic-selector" extends="core-selector">
 <script>
 Polymer( Platform.mixin( BasicWebComponents, {
+
+  attached: function() {
+    this.super();
+    this._basicAttached();
+  },
+
+  contentChanged: function() {
+    // If our contents change, then our items property implicitly changes too.
+    Object.getNotifier( this ).notify({
+      type: "update",
+      name: "items"
+    });
+  },
 
   excludedLocalNames: "template",
 
