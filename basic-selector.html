@@ -28,10 +28,12 @@ Polymer( Platform.mixin( BasicWebComponents, {
 
   contentChanged: function() {
     // If our contents change, then our items property implicitly changes too.
-    Object.getNotifier( this ).notify({
-      type: "update",
-      name: "items"
-    });
+    if ( Object.getNotifier ) {
+      Object.getNotifier( this ).notify({
+        type: "update",
+        name: "items"
+      });
+    }
   },
 
   excludedLocalNames: "template",
