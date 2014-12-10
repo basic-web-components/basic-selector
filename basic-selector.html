@@ -23,6 +23,13 @@ Polymer( Platform.mixin( BasicWebComponents, {
 
   attached: function() {
     this.super();
+
+    if(this.children.length){
+      for(var i=0; i<this.children.length; i++){
+        this.children[i].setAttribute('aria-selected', false);
+      }
+    }
+
     this._basicAttached();
   },
 
@@ -34,6 +41,12 @@ Polymer( Platform.mixin( BasicWebComponents, {
         name: "items"
       });
     }
+  },
+
+  selectedItemChanged: function() {
+    this.super();
+
+    //item.setAttribute('aria-selected', isSelected);
   },
 
   excludedLocalNames: "template",
