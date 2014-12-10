@@ -21,19 +21,29 @@ Extends core-selector to support easier composition:
 <script>
 Polymer( Platform.mixin( BasicWebComponents, {
 
+  // Override the base applySelection implementation to also update the
+  // aria-selected attribute at the same time.
+  applySelection: function( item, isSelected ) {
+    this.super([ item, isSelected ]);
+    item.setAttribute( "aria-selected", isSelected );
+  },
+
   attached: function() {
     this.super();
-
-    if(this.children.length){
-      for(var i=0; i<this.children.length; i++){
-        this.children[i].setAttribute('aria-selected', false);
-      }
-    }
-
     this._basicAttached();
   },
 
   contentChanged: function() {
+
+    // Perform per-item initialization.
+    Array.prototype.forEach.call( this.flattenChildren, function( child ) {
+      // If the item doesn't have an aria-selected member, we assume we haven't
+      // initialized it yet.
+      if ( child.getAttribute( "aria-selected" ) == null ) {
+        this._initializeItem( child );
+      }
+    }.bind( this ));
+
     // If our contents change, then our items property implicitly changes too.
     if ( Object.getNotifier ) {
       Object.getNotifier( this ).notify({
@@ -41,12 +51,6 @@ Polymer( Platform.mixin( BasicWebComponents, {
         name: "items"
       });
     }
-  },
-
-  selectedItemChanged: function() {
-    this.super();
-
-    //item.setAttribute('aria-selected', isSelected);
   },
 
   excludedLocalNames: "template",
@@ -72,8 +76,17 @@ Polymer( Platform.mixin( BasicWebComponents, {
   get selectedIndex() {
     var index = this.selected;
     return index || -1;
+  },
+
+  // The indicated item is a new child element. Perform any required
+  // initialization on it.
+  _initializeItem: function( item ) {
+    // Ensure aria-selected value matches the selection state indicated by
+    // the presence of the selected class (which is normally "core-selected").
+    var selected = item.classList.contains( this.selectedClass );
+    item.setAttribute( "aria-selected", selected );
   }
-  
+
 }));
 </script>
 </polymer-element>
