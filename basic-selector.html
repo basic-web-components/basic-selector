@@ -11,6 +11,10 @@ Extends core-selector to support easier composition:
 * This component generates property change notifications on the "items" property
   if content is added or removed at runtime, so you can bind to "items".
 
+This component also includes basic support for ARIA representation of selected
+state. An item's "aria-selected" attribute will be true if the item is selected,
+and false otherwise.
+
 @element basic-selector
 -->
 
@@ -36,11 +40,11 @@ Polymer( Platform.mixin( BasicWebComponents, {
   contentChanged: function() {
 
     // Perform per-item initialization.
-    Array.prototype.forEach.call( this.flattenChildren, function( child ) {
+    this.items.forEach( function( item ) {
       // If the item doesn't have an aria-selected member, we assume we haven't
       // initialized it yet.
-      if ( child.getAttribute( "aria-selected" ) == null ) {
-        this._initializeItem( child );
+      if ( !item.getAttribute( "aria-selected" )) {
+        this._itemAdded( item );
       }
     }.bind( this ));
 
@@ -79,8 +83,9 @@ Polymer( Platform.mixin( BasicWebComponents, {
   },
 
   // The indicated item is a new child element. Perform any required
-  // initialization on it.
-  _initializeItem: function( item ) {
+  // initialization on it. Subclasses can override this to perform additional
+  // initialization, taking care to call super().
+  _itemAdded: function( item ) {
     // Ensure aria-selected value matches the selection state indicated by
     // the presence of the selected class (which is normally "core-selected").
     var selected = item.classList.contains( this.selectedClass );
