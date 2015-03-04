@@ -19,11 +19,11 @@ and false otherwise.
 -->
 
 <link rel="import" href="../core-selector/core-selector.html">
-<link rel="import" href="../basic-element/basic-element.html">
+<script src="../basic-helpers/BasicContentHelpers.js"></script>
 
 <polymer-element name="basic-selector" extends="core-selector">
 <script>
-Polymer( Platform.mixin( BasicWebComponents, {
+Polymer( Platform.mixin({
 
   // Override the base applySelection implementation to also update the
   // aria-selected attribute at the same time.
@@ -34,7 +34,7 @@ Polymer( Platform.mixin( BasicWebComponents, {
 
   attached: function() {
     this.super();
-    this._basicAttached();
+    this.observeContentChanges();
   },
 
   contentChanged: function() {
@@ -55,6 +55,11 @@ Polymer( Platform.mixin( BasicWebComponents, {
         name: "items"
       });
     }
+  },
+
+  detached: function() {
+    this.super();
+    this.observeContentChanges(false);
   },
 
   excludedLocalNames: "template",
@@ -92,6 +97,6 @@ Polymer( Platform.mixin( BasicWebComponents, {
     item.setAttribute( "aria-selected", selected );
   }
 
-}));
+}, BasicContentHelpers));
 </script>
 </polymer-element>
